@@ -1,0 +1,17 @@
+<resources>
+    <!-- #7 French (Canada) translation -->
+    <string name="app_name">NASA Image du Jour</string>
+    <string name="version_number">1.0.0</string>
+    <string name="welcome_message">Bienvenue</string>
+    <string name="calendar_picker">Sélecteur de calendrier</string>
+    <string name="saved_urls">URLs enregistrées</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="menu_home">Accueil</string>
+    <string name="menu_saved_urls">URLs enregistrées</string>
+    <string name="menu_calendar_picker">Sélecteur de calendrier</string>
+    <string name="fetch_image">Récupérer l\'image</string>
+    <string name="enter_image_name">Entrez le nom de l\'image</string>
+    <string name="save">Enregistrer</string>
+    <string name="close">Fermer</string>
+</resources>

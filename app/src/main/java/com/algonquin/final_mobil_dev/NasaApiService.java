@@ -1,3 +1,5 @@
+
+// #9 AsyncTask is deprecated, so I used Retrofit instead.
 package com.algonquin.final_mobil_dev;
 
 import retrofit2.Call;

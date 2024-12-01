@@ -2,8 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_home"
-        android:title="Home" />
+        android:title="@string/menu_home" />
     <item
         android:id="@+id/nav_saved_urls"
-        android:title="Saved URLs" />
+        android:title="@string/menu_saved_urls" />
+    <item
+        android:id="@+id/nav_calendar_picker"
+        android:title="@string/menu_calendar_picker" />
 </menu>

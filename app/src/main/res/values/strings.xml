@@ -1,5 +1,16 @@
 <resources>
     <string name="app_name">NASA Image of the Day Viewer</string>
+    <string name="version_number">1.0.0</string>
+    <string name="welcome_message">Welcome</string>
+    <string name="calendar_picker">Calendar Picker</string>
+    <string name="saved_urls">Saved URLs</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_saved_urls">Saved URLs</string>
+    <string name="menu_calendar_picker">Calendar Picker</string>
+    <string name="fetch_image">Fetch Image</string>
+    <string name="enter_image_name">Enter image name</string>
+    <string name="save">Save</string>
+    <string name="close">Close</string>
 </resources>

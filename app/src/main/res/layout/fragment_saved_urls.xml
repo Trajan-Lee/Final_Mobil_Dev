@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SavedUrlsActivity">
+    android:id="@+id/fragment_saved_urls"
+    tools:context=".SavedUrlsFragment">
 
     <ListView
         android:id="@+id/listView"
