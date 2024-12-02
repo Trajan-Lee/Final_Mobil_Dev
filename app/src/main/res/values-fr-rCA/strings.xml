@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- #7 French (Canada) translation -->
     <string name="app_name">NASA Image du Jour</string>
@@ -10,8 +11,16 @@
     <string name="menu_home">Accueil</string>
     <string name="menu_saved_urls">URLs enregistrées</string>
     <string name="menu_calendar_picker">Sélecteur de calendrier</string>
+    <string name="menu_slideshow">Diaporama</string>
+    <string name="menu_exit">Sortie</string>
     <string name="fetch_image">Récupérer l\'image</string>
     <string name="enter_image_name">Entrez le nom de l\'image</string>
-    <string name="save">Enregistrer</string>
-    <string name="close">Fermer</string>
+    <string name="btn_save">Enregistrer</string>
+    <string name="btn_close">Fermer</string>
+    <string name="btn_help">Aide</string>
+    <string name="help_home">Ceci est l\'écran d\'accueil. Ici, vous pouvez naviguer vers différentes sections de l\'application.</string>
+    <string name="help_calendar_picker">Ceci est le sélecteur de calendrier. Naviguez jusqu\'à la date souhaitée, cliquez dessus, puis cliquez sur \'Récupérer l\'image\' pour ouvrir le visualiseur d\'images.</string>
+    <string name="help_saved_urls">Ceci est la section des URLs enregistrées. Ici, vous pouvez voir et gérer vos URLs enregistrées. Cliquez sur l\'une \'elles pour ouvrir le visualiseur d\'images.</string>
+    <string name="help_image_viewer">Ceci est le visualiseur d\'images. Ici, vous pouvez voir l\'image, l\'enregistrer/la mettre à jour sur votre appareil, ou la supprimer si vous le souhaitez.</string>
+    <string name="help_slideshow">Ceci est le diaporama. Il vous montre un diaporama de toutes vos images enregistrées.</string>
 </resources>

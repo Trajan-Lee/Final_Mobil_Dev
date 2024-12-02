@@ -23,12 +23,21 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+//#5.2 CalendarPickerFragment
 public class CalendarPickerFragment extends Fragment {
 
     private DatePicker datePicker;
     private Button buttonFetch;
     private NasaApiService nasaApiService;
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return The View for the fragment's UI, or null.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -69,7 +78,13 @@ public class CalendarPickerFragment extends Fragment {
     }
 
     // #10 SharedPrefs to save the last viewed calendar month and year
-    // Save the last viewed calendar month and year
+    /**
+     * Save the last viewed calendar month and year.
+     *
+     * @param context The context of the caller.
+     * @param month   The month to save.
+     * @param year    The year to save.
+     */
     public void saveLastViewedDate(Context context, int month, int year) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -78,7 +93,12 @@ public class CalendarPickerFragment extends Fragment {
         editor.apply();
     }
 
-    // Load the last viewed calendar month and year
+    /**
+     * Load the last viewed calendar month and year.
+     *
+     * @param context The context of the caller.
+     * @return An array containing the month and year.
+     */
     public int[] loadLastViewedDate(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE);
         int month = sharedPreferences.getInt("lastViewedMonth", -1); // Default value -1 if not found
@@ -86,6 +106,11 @@ public class CalendarPickerFragment extends Fragment {
         return new int[]{month, year};
     }
 
+    /**
+     * Fetch an image from NASA's API for the given date.
+     *
+     * @param date The date for which to fetch the image.
+     */
     private void fetchImage(String date) {
         Call<NasaImage> call = nasaApiService.getImage("vb1yIZofZfGMAEga9s6bhYahuUAgJv8HJtHnD7X1", date);
         call.enqueue(new Callback<NasaImage>() {
@@ -108,6 +133,12 @@ public class CalendarPickerFragment extends Fragment {
         });
     }
 
+    /**
+     * Open the ImageViewerFragment to display the fetched image.
+     *
+     * @param imageUrl The URL of the image to display.
+     * @param date     The date of the image.
+     */
     private void openImageViewerFragment(String imageUrl, String date) {
         ImageViewerFragment imageViewerFragment = new ImageViewerFragment();
         Bundle args = new Bundle();
@@ -117,7 +148,7 @@ public class CalendarPickerFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         if (mainActivity != null) {
-            mainActivity.replaceFragment(imageViewerFragment, false);
+            mainActivity.inflateImageFragment(imageViewerFragment);
         }
     }
 }

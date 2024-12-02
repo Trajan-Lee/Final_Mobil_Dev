@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NASA Image of the Day Viewer</string>
     <string name="version_number">1.0.0</string>
@@ -9,8 +10,16 @@
     <string name="menu_home">Home</string>
     <string name="menu_saved_urls">Saved URLs</string>
     <string name="menu_calendar_picker">Calendar Picker</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_exit">Exit</string>
     <string name="fetch_image">Fetch Image</string>
     <string name="enter_image_name">Enter image name</string>
-    <string name="save">Save</string>
-    <string name="close">Close</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_close">Close</string>
+    <string name="btn_help">Help</string>
+    <string name="help_home">This is the home screen. Here you can navigate to different sections of the app.</string>
+    <string name="help_calendar_picker">This is the calendar picker. Navigate to the desired date, click it, then click \'Fetch Image\' to open the Image Viewer</string>
+    <string name="help_saved_urls">This is the saved URLs section. Here you can view and manage your saved URLs. Click one to open the Image Viewer</string>
+    <string name="help_image_viewer">This is the Image Viewer. Here you can view the image, save/update it to your device, or delete it if desired</string>
+    <string name="help_slideshow">This is the Slide Show. This shows you a slideshow of all of your saved images.</string>
 </resources>

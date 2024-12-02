@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -19,12 +20,37 @@ import com.google.android.material.snackbar.Snackbar;
 import java.io.File;
 import java.util.List;
 
+//#5.3 SavedUrlsFragment
+/**
+ * SavedUrlsFragment is responsible for displaying a list of saved image URLs.
+ * It allows users to view and delete saved images.
+ */
 public class SavedUrlsFragment extends Fragment {
 
     private ListView listView;
     private List<ImageEntity> imageList;
     private AppDatabase db;
+    private SharedViewModel sharedViewModel;
 
+    /**
+     * Called when the fragment is first created.
+     *
+     * @param savedInstanceState If the fragment is being re-created from a previous saved state, this is the state.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+    }
+
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -35,9 +61,22 @@ public class SavedUrlsFragment extends Fragment {
 
         loadImagesFromDatabase();
 
+        // Watch changes in the ViewModel
+        sharedViewModel.getUpdated().observe(getViewLifecycleOwner(), isSaved -> {
+            if (isSaved) {
+                // Reload the images from the database
+                loadImagesFromDatabase();
+                // Reset the updated attribute to false
+                sharedViewModel.setUpdated(false);
+            }
+        });
         return view;
     }
 
+    /**
+     * Loads images from the database in a background thread.
+     * Updates the ListView adapter on the main thread.
+     */
     private void loadImagesFromDatabase() {
         new Thread(() -> {
             imageList = db.imageDao().getAllImages();
@@ -49,23 +88,22 @@ public class SavedUrlsFragment extends Fragment {
 
 
     // #1 Contains List View
+    /**
+     * Adapter class for displaying images in a ListView.
+     */
     private class ImageListAdapter extends BaseAdapter {
-
         @Override
         public int getCount() {
             return imageList.size();
         }
-
         @Override
         public Object getItem(int position) {
             return imageList.get(position);
         }
-
         @Override
         public long getItemId(int position) {
             return position;
         }
-
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
@@ -89,16 +127,22 @@ public class SavedUrlsFragment extends Fragment {
                 bundle.putString("date", imageEntity.date);
                 ImageViewerFragment imageViewerFragment = new ImageViewerFragment();
                 imageViewerFragment.setArguments(bundle);
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, imageViewerFragment)
-                        .addToBackStack(null)
-                        .commit();
+                MainActivity mainActivity = (MainActivity) getActivity();
+                if (mainActivity != null) {
+                    mainActivity.inflateImageFragment(imageViewerFragment);
+                }
             });
 
             return convertView;
         }
     }
 
+    /**
+     * Deletes the specified image from the database and storage.
+     * Shows a Snackbar to confirm the deletion.
+     *
+     * @param imageEntity The image entity to delete.
+     */
     private void deleteImage(ImageEntity imageEntity) {
         Snackbar snackbar = Snackbar.make(getView(), "Are you sure you want to delete this image?", Snackbar.LENGTH_INDEFINITE);
         snackbar.setAction("Confirm", v -> {

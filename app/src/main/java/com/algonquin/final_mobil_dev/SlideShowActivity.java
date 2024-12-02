@@ -14,6 +14,10 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 import java.util.List;
 
+/**
+ * SlideShowActivity is responsible for displaying a slideshow of saved images.
+ * It loads images from the database and displays them in a loop with a progress bar indicating the time until the next image.
+ */
 public class SlideShowActivity extends BaseActivity {
 
     private ImageView imageView;
@@ -23,6 +27,11 @@ public class SlideShowActivity extends BaseActivity {
     private Handler handler = new Handler();
     private Runnable runnable;
 
+    /**
+     * Called when the activity is first created.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down then this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +49,10 @@ public class SlideShowActivity extends BaseActivity {
 
     }
 
+    /**
+     * Starts the slideshow by displaying images in a loop.
+     * Uses a Handler to schedule image changes every 5 seconds.
+     */
     private void startSlideShow() {
         if (imageList == null || imageList.isEmpty()) {
             return;
@@ -68,7 +81,8 @@ public class SlideShowActivity extends BaseActivity {
 
         handler.post(runnable);
 
-        // Update progress bar every 100ms
+        // #2 progress bar to show time till next picture
+        // Buttons are everywhere, so I'm not going to use a specific comment for this
         new Thread(() -> {
             while (true) {
                 for (int i = 0; i <= 100; i++) {
@@ -84,6 +98,10 @@ public class SlideShowActivity extends BaseActivity {
         }).start();
     }
 
+    /**
+     * Called when the activity is destroyed.
+     * Removes any pending callbacks to the runnable to prevent memory leaks.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();

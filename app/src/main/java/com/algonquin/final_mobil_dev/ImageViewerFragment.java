@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import com.bumptech.glide.Glide;
@@ -30,6 +31,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+// #5.1 ImageViewerFragment
+/**
+ * ImageViewerFragment is a Fragment subclass that displays an image in an ImageView.
+ * It allows the user to save the image to external storage and add a name to the image.
+ */
 public class ImageViewerFragment extends Fragment {
 
     // #3.1 edit text
@@ -41,7 +47,28 @@ public class ImageViewerFragment extends Fragment {
     private AppDatabase db;
     private String selectedDate;
     private ImageEntity imageEntity;
+    private SharedViewModel sharedViewModel;
+    private static final String TAG = "ImageViewerFragment";
 
+    /**
+     * Called when the fragment is first created.
+     *
+     * @param savedInstanceState If the fragment is being re-created from a previous saved state, this is the state.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+    }
+
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,6 +79,7 @@ public class ImageViewerFragment extends Fragment {
         buttonSaveImage = view.findViewById(R.id.buttonSaveImage);
         buttonClose = view.findViewById(R.id.buttonClose);
 
+        // #8.7 The database is retrieved or constructed here
         db = Room.databaseBuilder(getContext(), AppDatabase.class, "image-database").build();
 
         if (getArguments() != null) {
@@ -73,17 +101,40 @@ public class ImageViewerFragment extends Fragment {
                 } else {
                     updateImage(imageName);
                 }
-                getParentFragmentManager().popBackStack();
+                closeImageViewer();
             }
         });
 
         buttonClose.setOnClickListener(v -> {
-            getParentFragmentManager().popBackStack();
+            closeImageViewer();
         });
 
         return view;
     }
 
+    /**
+     * Closes the image viewer.
+     * On tablets, it removes the fragment. On phones, it pops the back stack.
+     */
+    private void closeImageViewer() {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null && mainActivity.isTablet()) {
+            // On tablet, replace the ImageViewerFragment with an empty fragment or remove it
+            mainActivity.getSupportFragmentManager().beginTransaction()
+                    .remove(this)
+                    .commit();
+        } else {
+            // On phone, pop the back stack
+            getParentFragmentManager().popBackStack();
+        }
+    }
+    /**
+     * Checks the database for an image with the specified date.
+     * If found, loads the image from the file. Otherwise, loads the image from the web.
+     *
+     * @param date The date of the image to check.
+     * @param imageUrl The URL of the image to load if not found in the database.
+     */
     private void checkDatabaseForImage(String date, String imageUrl) {
         new Thread(() -> {
             imageEntity = db.imageDao().findByDate(date);
@@ -100,6 +151,11 @@ public class ImageViewerFragment extends Fragment {
         }).start();
     }
 
+    /**
+     * Loads an image from the specified file path.
+     *
+     * @param imagePath The path of the image file to load.
+     */
     private void loadImageFromFile(String imagePath) {
         File imageFile = new File(imagePath);
         if (imageFile.exists()) {
@@ -108,22 +164,30 @@ public class ImageViewerFragment extends Fragment {
                     .into(imageView);
         } else {
             Toast.makeText(getContext(), "Image file not found", Toast.LENGTH_SHORT).show();
-            getParentFragmentManager().popBackStack();
+            closeImageViewer();
         }
     }
 
+    /**
+     * Adds a delete button to the fragment's view.
+     * The delete button allows the user to delete the current image.
+     */
     private void addDeleteButton() {
         LinearLayout buttonContainer = getView().findViewById(R.id.buttonContainer);
         buttonDelete = new Button(getContext());
         buttonDelete.setText("Delete");
         buttonDelete.setOnClickListener(v -> {
             deleteImage();
-            getParentFragmentManager().popBackStack();
+            closeImageViewer();
         });
         buttonContainer.addView(buttonDelete);
     }
 
     // #8.3 delete image from storage and DB
+    /**
+     * Deletes the current image from the storage and database.
+     * Shows a Snackbar to confirm the deletion.
+     */
     private void deleteImage() {
         // #3.3 snackbar
         Snackbar snackbar = Snackbar.make(getView(), "Are you sure you want to delete this image?", Snackbar.LENGTH_INDEFINITE);
@@ -134,18 +198,32 @@ public class ImageViewerFragment extends Fragment {
                     imageFile.delete();
                 }
                 db.imageDao().delete(imageEntity);
+                // Notify the ViewModel that an image has been saved
+                sharedViewModel.setUpdated(true);
             }).start();
         });
         snackbar.show();
     }
 
+    /**
+     * Updates the current image's name in the database.
+     *
+     * @param imageName The new name for the image.
+     */
     private void updateImage(String imageName) {
         new Thread(() -> {
             imageEntity.name = imageName;
             db.imageDao().update(imageEntity);
+            // Notify the ViewModel that an image has been saved
+            sharedViewModel.setUpdated(true);
         }).start();
     }
 
+    /**
+     * Loads an image from the web using the specified URL.
+     *
+     * @param imageUrl The URL of the image to load.
+     */
     public void loadImageFromWeb(String imageUrl) {
         Glide.with(this)
                 .load(imageUrl)
@@ -153,20 +231,33 @@ public class ImageViewerFragment extends Fragment {
     }
 
     // #8.1 save image to external storage
-    private static final String TAG = "ImageViewerFragment";
-
+    /**
+     * Saves the current image to external storage and the database.
+     *
+     * @param selectedDate The date associated with the image.
+     * @param imageName The name of the image.
+     */
     private void saveImage(String selectedDate, String imageName) {
         Log.d(TAG, "saveImage called with date: " + selectedDate + " and name: " + imageName);
         Drawable drawable = imageView.getDrawable();
         if (drawable instanceof BitmapDrawable) {
             Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
             saveBitmapToFile(bitmap, selectedDate, imageName);
+            // Notify the ViewModel that an image has been saved
+            sharedViewModel.setUpdated(true);
         } else {
             Log.e(TAG, "Drawable is not an instance of BitmapDrawable");
             Toast.makeText(getContext(), "Failed to save image", Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Saves the specified bitmap to a file and adds the image details to the database.
+     *
+     * @param bitmap The bitmap to save.
+     * @param selectedDate The date associated with the image.
+     * @param imageName The name of the image.
+     */
     private void saveBitmapToFile(Bitmap bitmap, String selectedDate, String imageName) {
         File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "NasaApp");
         if (!storageDir.exists()) {
@@ -188,6 +279,12 @@ public class ImageViewerFragment extends Fragment {
     }
 
     // #8.2 add image details to DB
+    /**
+     * Adds the image details to the database.
+     *
+     * @param imageName The name of the image.
+     * @param imageUrl The URL of the image.
+     */
     private void addImageToDatabase(String imageName, String imageUrl) {
         new Thread(() -> {
             ImageEntity image = new ImageEntity();
